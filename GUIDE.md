@@ -70,6 +70,12 @@ ALSO SOME LEARNINGS -
 
 2. the option - `"allowImportingTsExtensions": true` is not good for prod. **AVOID IT**
 
+3. IMP CMD -
+
+- `npx prisma migrate dev --name name_of_migration` - Used after schema file change to sync with db.
+- `npx prisma generate` - Used after migration. because to generate new prismaclient based on updated schema
+- `npx prisma db push` - This command quickly syncs your Prisma schema with the database schema without creating a migration file.
+
 ---
 
 ### Prisma setup v7

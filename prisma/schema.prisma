@@ -14,8 +14,24 @@ datasource db {
 }
 
 model User {
-  id String @id @default(cuid())
-  username String
-  email String @unique
-  password String
+    id String @id @default(cuid())
+    username String @unique
+    avatar String?
+    password String
+    sentMessages Message[] @relation("sender") 
+    receivedMessages Message[] @relation("receiver") 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Message {
+    id String  @id @default(cuid())
+    textContent String?
+    mediaContent  String?
+    isRead Boolean @default(false)
+    senderId String
+    sender User @relation("sender",fields:[senderId],references:[id],onDelete:Cascade)
+    receiverId String
+    receiver User @relation("receiver",fields:[receiverId],references:[id],onDelete:Cascade)
+    createdAt DateTime @default(now())
 }
