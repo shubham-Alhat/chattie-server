@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -25,5 +26,7 @@ app.use(cookieParser());
 app.get("/api/v1", (req, res) => {
   res.status(200).json({ message: "hello from server" });
 });
+
+app.use("/api/v1/auth", authRouter);
 
 export default app;
