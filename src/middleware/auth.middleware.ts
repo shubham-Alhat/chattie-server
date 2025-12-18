@@ -29,6 +29,7 @@ export const authMiddleware = async (
 
     const secretKey: any = process.env.JWT_SECRET;
 
+    // jwt throw error here if not matched
     const decodedToken = jwt.verify(token, secretKey) as decodedTokenState;
 
     const user = await prisma.user.findUnique({
@@ -54,6 +55,7 @@ export const authMiddleware = async (
     return res.status(500).json({
       message: "error in middleware",
       success: false,
+      redirect: "/login",
     });
   }
 };
