@@ -82,8 +82,8 @@ const loginUser = async (req: Request, res: Response) => {
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
+    const { username, email, password, avatar } = req.body;
+    if (!username || !email || !password || !avatar) {
       return res
         .status(400)
         .json({ message: "User data not found", success: false });
@@ -113,6 +113,7 @@ const registerUser = async (req: Request, res: Response) => {
         username: username,
         email: email,
         password: hashPassword,
+        avatar: avatar,
       },
       omit: {
         password: true,
@@ -133,4 +134,26 @@ const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export { loginUser, registerUser };
+const logoutUser = async (req: Request, res: Response) => {
+  const user = req.user;
+  // throw error if user not found
+  if (!user) {
+    return res.status(401).json({
+      message: "User not found, Please login",
+      success: false,
+    });
+  }
+
+  const options: Object = {
+    httpOnly: true, // can't be accessed by JS
+    secure: process.env.NODE_ENV !== "development", // only HTTPS in production
+  };
+
+  // clear cookies
+  return res.status(200).clearCookie("accessToken", options).json({
+    message: "User logout successfully",
+    success: true,
+  });
+};
+
+export { loginUser, registerUser, logoutUser };
