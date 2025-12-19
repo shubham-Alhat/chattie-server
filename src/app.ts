@@ -25,7 +25,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.get("/api/v1", (req, res) => {
-  res.status(200).json({ message: "hello from server" });
+  return res.status(200).json({ message: "hello from server" });
 });
 
 app.use("/api/v1/auth", authRouter);

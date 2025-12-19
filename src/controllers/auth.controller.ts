@@ -62,10 +62,9 @@ const loginUser = async (req: Request, res: Response) => {
 
     const options: Object = {
       httpOnly: true, // can't be accessed by JS
-      secure: process.env.NODE_ENV !== "development", // only HTTPS in production
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000, // 1 days
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     };
 
     res.status(200).cookie("accessToken", token, options).json({
