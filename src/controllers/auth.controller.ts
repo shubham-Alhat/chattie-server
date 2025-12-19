@@ -60,6 +60,10 @@ const loginUser = async (req: Request, res: Response) => {
       expiresIn: "1d",
     });
 
+    // when cross domains are there
+    // secure:true and sameSite:"none" and httpOnly:true
+    // it worked
+
     const options: Object = {
       httpOnly: true, // can't be accessed by JS
       secure: true,

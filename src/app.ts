@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.route.js";
+import chatRouter from "./routes/chat.route.js";
 import { authMiddleware } from "./middleware/auth.middleware.js";
 
 dotenv.config();
@@ -29,6 +30,8 @@ app.get("/api/v1", (req, res) => {
 });
 
 app.use("/api/v1/auth", authRouter);
+
+app.use("/api/v1/chats", chatRouter);
 
 app.get("/api/v1/checkme", authMiddleware, (req, res) => {
   const user = req.user;
