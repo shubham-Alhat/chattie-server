@@ -42,4 +42,55 @@ const getAllChats = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllChats };
+const sendMessage = async (req: Request, res: Response) => {
+  try {
+    // access user by middleware
+    const user = req.user;
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "User not found", success: false });
+    }
+
+    // get message content and receiverId from req.body
+    const { textMessage, receiverId } = req.body;
+
+    if (!textMessage || !receiverId) {
+      return res
+        .status(400)
+        .json({ message: "Message | receiverId not found!!", success: false });
+    }
+
+    // create entry in db
+    const sentMessage = await prisma.message.create({
+      data: {
+        textContent: textMessage,
+        isRead: false,
+        senderId: user.id,
+        receiverId: receiverId,
+      },
+    });
+
+    if (!sentMessage) {
+      return res
+        .status(500)
+        .json({ message: "Message not created in db", success: false });
+    }
+
+    // success response
+    return res.status(201).json({
+      message: "Message created successfully",
+      success: true,
+      data: sentMessage,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Error while sending message",
+      success: false,
+    });
+  }
+};
+
+export { getAllChats, sendMessage };
