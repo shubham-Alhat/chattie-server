@@ -93,4 +93,59 @@ const sendMessage = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllChats, sendMessage };
+const getSelectedChatMessage = async (req: Request, res: Response) => {
+  try {
+    // access user by middleware
+    const user = req.user;
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "User not found", success: false });
+    }
+
+    // get receiverId from req.body
+    const { receiverId } = req.params;
+
+    if (!receiverId || receiverId === user.id) {
+      return res
+        .status(400)
+        .json({ message: "Invalid ReceiverId found!!", success: false });
+    }
+
+    const allMessages = await prisma.message.findMany({
+      where: {
+        OR: [
+          {
+            senderId: user.id,
+            receiverId: receiverId,
+          },
+          {
+            senderId: receiverId,
+            receiverId: user.id,
+          },
+        ],
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    return res.status(200).json({
+      message: "Fetched messages successfully",
+      success: true,
+      data: allMessages,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error in fetching messages", success: false });
+  }
+};
+
+export { getAllChats, sendMessage, getSelectedChatMessage };
