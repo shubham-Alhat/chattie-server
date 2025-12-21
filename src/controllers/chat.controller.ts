@@ -70,6 +70,18 @@ const sendMessage = async (req: Request, res: Response) => {
         senderId: user.id,
         receiverId: receiverId,
       },
+      include: {
+        sender: {
+          omit: {
+            password: true,
+          },
+        },
+        receiver: {
+          omit: {
+            password: true,
+          },
+        },
+      },
     });
 
     if (!sentMessage) {
