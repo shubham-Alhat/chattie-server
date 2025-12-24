@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import authRouter from "./routes/auth.route.js";
 import chatRouter from "./routes/chat.route.js";
 import { authMiddleware } from "./middleware/auth.middleware.js";
+import http from "http";
+import { WebSocketServer } from "ws";
 
 dotenv.config();
 
@@ -40,4 +42,20 @@ app.get("/api/v1/checkme", authMiddleware, (req, res) => {
     .json({ message: "checkme success", data: user, success: true });
 });
 
-export default app;
+const server = http.createServer(app);
+
+const wss = new WebSocketServer({ server, path: "/ws" });
+
+wss.on("connection", (ws) => {
+  console.log("client connected to ws server");
+
+  ws.on("message", (data) => {
+    console.log(data.toString());
+  });
+
+  ws.on("close", () => {
+    console.log("connection closed..");
+  });
+});
+
+export default server;
