@@ -47,14 +47,22 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/ws" });
 
 wss.on("connection", (ws) => {
-  console.log("client connected to ws server");
+  console.log("🟢 Client connected to ws server");
 
-  ws.on("message", (data) => {
-    console.log(data.toString());
+  // listen for user_connected event
+  ws.on("message", (rawData) => {
+    // convert raw data to json
+    const data = JSON.parse(rawData.toString());
+
+    // now check type of events
+    if (data.type === "user_connected") {
+      console.log(data.userId, "  - userId");
+      ws.send(JSON.stringify({ type: "online_user", userId: data.userId }));
+    }
   });
 
   ws.on("close", () => {
-    console.log("connection closed..");
+    console.log("🔴 Connection closed..");
   });
 });
 
