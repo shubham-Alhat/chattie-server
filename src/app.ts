@@ -57,7 +57,6 @@ wss.on("connection", (ws) => {
     // now check type of events
     if (data.type === "user_connected") {
       console.log(data.userId, "  - userId");
-      ws.send(JSON.stringify({ type: "online_user", userId: data.userId }));
     }
   });
 
