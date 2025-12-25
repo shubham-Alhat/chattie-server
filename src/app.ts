@@ -82,6 +82,13 @@ wss.on("connection", (ws) => {
         //   key = the KEY you used to store it
         // });
 
+        // send prev online list
+        const onlineUserIds = Array.from(activeConnections.keys()).filter(
+          (id) => id !== userId
+        );
+
+        ws.send(JSON.stringify({ type: "online_users_list", onlineUserIds }));
+
         // broadcast to all
         activeConnections.forEach((otherWs, otherUserId) => {
           if (otherUserId !== userId && otherWs.readyState === 1) {
