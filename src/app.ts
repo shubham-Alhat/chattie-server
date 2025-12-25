@@ -46,22 +46,68 @@ const server = http.createServer(app);
 
 const wss = new WebSocketServer({ server, path: "/ws" });
 
+// new map for storing connections
+const activeConnections = new Map();
+
 wss.on("connection", (ws) => {
   console.log("🟢 Client connected to ws server");
 
+  let userId: string | null = null;
+
   // listen for user_connected event
   ws.on("message", (rawData) => {
+    // rawData IS the actual message data (Buffer/string) sent from frontend
     // convert raw data to json
-    const data = JSON.parse(rawData.toString());
+    // always use try-catch because client can send invalid json??
+    try {
+      const data = JSON.parse(rawData.toString());
 
-    // now check type of events
-    if (data.type === "user_connected") {
-      console.log(data.userId, "  - userId");
+      // now check type of events
+      if (data.type === "user_connected") {
+        userId = data.userId;
+
+        // Handle reconnection: if user already has a connection, close the old one
+        // eg: If a user opens a new tab, close the old connection and reconnect new ws
+        const existingConnection = activeConnections.get(userId);
+        if (existingConnection && existingConnection !== ws) {
+          existingConnection.close();
+        }
+
+        // store connections
+        activeConnections.set(userId, ws); // while setting up this, we use key as userId and value as ws. (key=userId and value=ws)
+        // but when we do forEach(); see below
+
+        // map.forEach((value, key) => {
+        //   value = the VALUE stored in the map
+        //   key = the KEY you used to store it
+        // });
+
+        // broadcast to all
+        activeConnections.forEach((otherWs, otherUserId) => {
+          if (otherUserId !== userId && otherWs.readyState === 1) {
+            otherWs.send(
+              JSON.stringify({ type: "user_online", userId: userId })
+            );
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
     }
   });
 
   ws.on("close", () => {
     console.log("🔴 Connection closed..");
+    if (userId) {
+      activeConnections.delete(userId);
+    }
+
+    // broadcast to all
+    activeConnections.forEach((otherWs, otherUserId) => {
+      if (otherWs.readyState === 1) {
+        otherWs.send(JSON.stringify({ type: "user_offline", userId }));
+      }
+    });
   });
 });
 
