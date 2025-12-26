@@ -52,6 +52,7 @@ const activeConnections = new Map();
 wss.on("connection", (ws) => {
   console.log("🟢 Client connected to ws server");
 
+  // userId for each user
   let userId: string | null = null;
 
   // listen for user_connected event
@@ -82,14 +83,14 @@ wss.on("connection", (ws) => {
         //   key = the KEY you used to store it
         // });
 
-        // send prev online list
+        // send prev online list to connected user
         const onlineUserIds = Array.from(activeConnections.keys()).filter(
           (id) => id !== userId
         );
 
         ws.send(JSON.stringify({ type: "online_users_list", onlineUserIds }));
 
-        // broadcast to all
+        // broadcast to all others that this user is online now
         activeConnections.forEach((otherWs, otherUserId) => {
           if (otherUserId !== userId && otherWs.readyState === 1) {
             otherWs.send(
