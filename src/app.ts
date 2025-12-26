@@ -63,8 +63,24 @@ wss.on("connection", (ws) => {
     try {
       const data = JSON.parse(rawData.toString());
 
-      // now check type of events
+      // check send_message event
+      if (data.type === "send_message") {
+        const newMessage = data.newMessage;
+
+        // Just get the specific connection
+        const receiverWs = activeConnections.get(newMessage.receiverId);
+        if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
+          receiverWs.send(JSON.stringify({ type: "new_message", newMessage }));
+        }
+
+        // activeConnections.forEach((otherWs, otherId) => {
+        //   if (otherWs.readyState === 1 && otherId === newMessage.receiverId) {
+        //     otherWs.send(JSON.stringify({ type: "new_message", newMessage }));
+        //   }
+        // });
+      }
       if (data.type === "user_connected") {
+        // now check type of events
         userId = data.userId;
 
         // Handle reconnection: if user already has a connection, close the old one
