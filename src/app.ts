@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.get("/api/v1", (req, res) => {
+app.get("/api/v1/health", (req, res) => {
   return res.status(200).json({ message: "hello from server" });
 });
 
@@ -51,6 +51,7 @@ const activeConnections = new Map();
 
 wss.on("connection", (ws) => {
   console.log("🟢 Client connected to ws server");
+  // verifyClient function in ws https://share.google/aimode/h2erulMUdpMLH1fs9
 
   // userId for each user
   let userId: string | null = null;
