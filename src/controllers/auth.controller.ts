@@ -67,8 +67,9 @@ const loginUser = async (req: Request, res: Response) => {
     const options: Object = {
       httpOnly: true, // can't be accessed by JS
       secure: true,
-      sameSite: "none",
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 days
+      path: "/",
     };
 
     res.status(200).cookie("accessToken", token, options).json({
